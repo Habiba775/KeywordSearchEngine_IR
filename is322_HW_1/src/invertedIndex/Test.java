@@ -46,6 +46,7 @@ public class Test {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             phrase = in.readLine();
 /// -3- **** complete here ****
+            System.out.println("Boo0lean Model result = \n" + index.find_24_01(phrase));
         } while (!phrase.isEmpty());
 
     }
