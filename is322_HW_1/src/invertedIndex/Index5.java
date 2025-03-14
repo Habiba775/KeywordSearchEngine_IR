@@ -204,7 +204,8 @@ public class Index5 {
 
     //----------------------------------------------------------------------------
 
-    //TODO: comment this method
+    // finds the intersection of two sorted posting lists (pL1 and pL2).
+    // It returns a new posting list (answer)containing only the document IDs that appear in both input lists.
     Posting intersect(Posting pL1, Posting pL2) {
         Posting answer = null;      //will hold the PL with the common documents in the two arguments
         Posting last = null;        //an auxiliary PL
@@ -212,19 +213,22 @@ public class Index5 {
         //iterate over the two posting lists
         while (pL1 != null && pL2 != null) {
             if (pL1.docId == pL2.docId) {
-                Posting match = new Posting(pL1.docId);
-                if (answer == null) {
+                Posting match = new Posting(pL1.docId); // Create a new Posting node with the matched docId
+                if (answer == null) {// If this is the first match, initialize the answer list
                     answer = match;
                     last = match;
-                } else {
+                } else {// else append to the answer list
                     last.next = match;
-                    last = match;
+                    last = match; // move last pointer
                 }
+                //move both pointers forward as the current document is proceeded
                 pL1 = pL1.next;
                 pL2 = pL2.next;
+                //if pl1 document id smaller than pl2 move pl1 forward
             } else if (pL1.docId < pL2.docId) {
                 pL1 = pL1.next;
             } else {
+                // if pl2 document id smaller than pl1 move pl1 forward
                 pL2 = pL2.next;
             }
         }
@@ -254,17 +258,19 @@ public class Index5 {
     //---------------------------------
 
     String[] sort(String[] words) {  //bubble sort
-        boolean sorted = false;
-        String sTmp;
+        boolean sorted = false; // keep track if the words are sorted
+        String sTmp; // temp variable for swapping
         //-------------------------------------------------------
         while (!sorted) {
-            sorted = true;
+            sorted = true;// assume the array is sorted
             for (int i = 0; i < words.length - 1; i++) {
-                int compare = words[i].compareTo(words[i + 1]);
-                if (compare > 0) {
-                    sTmp = words[i];
+                int compare = words[i].compareTo(words[i + 1]); // compare adjacent words
+                if (compare > 0) { // if compare>0 means that words[i] comes after words[i+1] so swap them
+                    sTmp = words[i]; //put the current word in temporary variable
+                    //swap
                     words[i] = words[i + 1];
                     words[i + 1] = sTmp;
+                    //make sorted false again to indicate that the array need another pass
                     sorted = false;
                 }
             }
