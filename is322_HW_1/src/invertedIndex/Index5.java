@@ -280,11 +280,16 @@ public class Index5 {
 
      //---------------------------------
 
+//  this function takes a file name and stores source records and invertedList into a file
     public void store(String storageName) {
         try {
-            String pathToStorage = "is322_HW_1/"+storageName;
+            //  modify this path and add the appropriate one
+            String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;
+            // open file for reading
             Writer wr = new FileWriter(pathToStorage);
+            // write the source records into the file
             for (Map.Entry<Integer, SourceRecord> entry : sources.entrySet()) {
+                //ensuring the record is correctly parsed
                 System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue().URL + ", Value = " + entry.getValue().title + ", Value = " + entry.getValue().text);
                 wr.write(entry.getKey().toString() + ",");
                 wr.write(entry.getValue().URL.toString() + ",");
@@ -293,22 +298,33 @@ public class Index5 {
                 wr.write(String.format("%4.4f", entry.getValue().norm) + ",");
                 wr.write(entry.getValue().text.toString().replace(',', '~') + "\n");
             }
+            //write section2 as a delimiter to separate source records from the inverted index
             wr.write("section2" + "\n");
 
+            //initialize an iterator to iterate over the invertedList
             Iterator it = index.entrySet().iterator();
+
+            //iterate until reach the end of the invertedList
             while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                DictEntry dd = (DictEntry) pair.getValue();
+                Map.Entry pair = (Map.Entry) it.next();//word
+                DictEntry dd = (DictEntry) pair.getValue();//document frequency, term frequency
+
                 //  System.out.print("** [" + pair.getKey() + "," + dd.doc_freq + "] <" + dd.term_freq + "> =--> ");
+
+                // write the word, document frequency, and term frequency
                 wr.write(pair.getKey().toString() + "," + dd.doc_freq + "," + dd.term_freq + ";");
+
+                //write the posting list for the current term
                 Posting p = dd.pList;
                 while (p != null) {
                     //    System.out.print( p.docId + "," + p.dtf + ":");
+                    // Write document ID and term frequency in the document, separated by ":"
                     wr.write(p.docId + "," + p.dtf + ":");
                     p = p.next;
                 }
                 wr.write("\n");
             }
+            //write an end marker to indicate the end of the index
             wr.write("end" + "\n");
             wr.close();
             System.out.println("=============EBD STORE=============");
