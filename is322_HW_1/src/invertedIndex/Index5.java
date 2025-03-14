@@ -48,8 +48,12 @@ public class Index5 {
         while (p != null) {
             /// -4- **** complete here ****
             // fix get rid of the last comma
-            System.out.print("" + p.docId + "," );
+            System.out.print("" + p.docId );
             p = p.next;
+
+            if (p != null) {
+                System.out.print(",");
+            }
         }
         System.out.println("]");
     }
