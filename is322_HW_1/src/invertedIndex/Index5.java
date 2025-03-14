@@ -204,7 +204,8 @@ public class Index5 {
 
     //----------------------------------------------------------------------------
 
-    //TODO: comment this method
+    // finds the intersection of two sorted posting lists (pL1 and pL2).
+    // It returns a new posting list (answer)containing only the document IDs that appear in both input lists.
     Posting intersect(Posting pL1, Posting pL2) {
         Posting answer = null;      //will hold the PL with the common documents in the two arguments
         Posting last = null;        //an auxiliary PL
@@ -212,19 +213,22 @@ public class Index5 {
         //iterate over the two posting lists
         while (pL1 != null && pL2 != null) {
             if (pL1.docId == pL2.docId) {
-                Posting match = new Posting(pL1.docId);
-                if (answer == null) {
+                Posting match = new Posting(pL1.docId); // Create a new Posting node with the matched docId
+                if (answer == null) {// If this is the first match, initialize the answer list
                     answer = match;
                     last = match;
-                } else {
+                } else {// else append to the answer list
                     last.next = match;
-                    last = match;
+                    last = match; // move last pointer
                 }
+                //move both pointers forward as the current document is proceeded
                 pL1 = pL1.next;
                 pL2 = pL2.next;
+                //if pl1 document id smaller than pl2 move pl1 forward
             } else if (pL1.docId < pL2.docId) {
                 pL1 = pL1.next;
             } else {
+                // if pl2 document id smaller than pl1 move pl1 forward
                 pL2 = pL2.next;
             }
         }
@@ -232,7 +236,7 @@ public class Index5 {
     }
 
     //this method prints the info of the documents where all the words in the "phrase" argument appear in each, then returns this info in the string "result"
-    public String find_24_01(String phrase) { // any mumber of terms non-optimized search 
+    public String find_24_01(String phrase) { // any mumber of terms non-optimized search
         String result = "";
         //split the phrase to its words using a regex "\\W+", which stands for any number of consecutive occurrences of any non-word character (anything other than a letter, digit, or underscore)
         //then store the number of words in len
@@ -240,9 +244,7 @@ public class Index5 {
         int len = words.length;
         
         //fix this if word is not in the hash table will crash...
-        //get the posting list of the first word from the index
         Posting posting = index.get(words[0].toLowerCase()).pList;
-        //starting from the second word, iterate over all the other words, and find the intersection between the docs where the current word appear and all the other previous words appear
         int i = 1;
         while (i < len) {
             posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
@@ -262,17 +264,19 @@ public class Index5 {
     //---------------------------------
 
     String[] sort(String[] words) {  //bubble sort
-        boolean sorted = false;
-        String sTmp;
+        boolean sorted = false; // keep track if the words are sorted
+        String sTmp; // temp variable for swapping
         //-------------------------------------------------------
         while (!sorted) {
-            sorted = true;
+            sorted = true;// assume the array is sorted
             for (int i = 0; i < words.length - 1; i++) {
-                int compare = words[i].compareTo(words[i + 1]);
-                if (compare > 0) {
-                    sTmp = words[i];
+                int compare = words[i].compareTo(words[i + 1]); // compare adjacent words
+                if (compare > 0) { // if compare>0 means that words[i] comes after words[i+1] so swap them
+                    sTmp = words[i]; //put the current word in temporary variable
+                    //swap
                     words[i] = words[i + 1];
                     words[i + 1] = sTmp;
+                    //make sorted false again to indicate that the array need another pass
                     sorted = false;
                 }
             }
@@ -282,11 +286,16 @@ public class Index5 {
 
      //---------------------------------
 
+//  this function takes a file name and stores source records and invertedList into a file
     public void store(String storageName) {
         try {
+            //  modify this path and add the appropriate one
             String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;
+            // open file for reading
             Writer wr = new FileWriter(pathToStorage);
+            // write the source records into the file
             for (Map.Entry<Integer, SourceRecord> entry : sources.entrySet()) {
+                //ensuring the record is correctly parsed
                 System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue().URL + ", Value = " + entry.getValue().title + ", Value = " + entry.getValue().text);
                 wr.write(entry.getKey().toString() + ",");
                 wr.write(entry.getValue().URL.toString() + ",");
@@ -295,22 +304,33 @@ public class Index5 {
                 wr.write(String.format("%4.4f", entry.getValue().norm) + ",");
                 wr.write(entry.getValue().text.toString().replace(',', '~') + "\n");
             }
+            //write section2 as a delimiter to separate source records from the inverted index
             wr.write("section2" + "\n");
 
+            //initialize an iterator to iterate over the invertedList
             Iterator it = index.entrySet().iterator();
+
+            //iterate until reach the end of the invertedList
             while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                DictEntry dd = (DictEntry) pair.getValue();
+                Map.Entry pair = (Map.Entry) it.next();//word
+                DictEntry dd = (DictEntry) pair.getValue();//document frequency, term frequency
+
                 //  System.out.print("** [" + pair.getKey() + "," + dd.doc_freq + "] <" + dd.term_freq + "> =--> ");
+
+                // write the word, document frequency, and term frequency
                 wr.write(pair.getKey().toString() + "," + dd.doc_freq + "," + dd.term_freq + ";");
+
+                //write the posting list for the current term
                 Posting p = dd.pList;
                 while (p != null) {
                     //    System.out.print( p.docId + "," + p.dtf + ":");
+                    // Write document ID and term frequency in the document, separated by ":"
                     wr.write(p.docId + "," + p.dtf + ":");
                     p = p.next;
                 }
                 wr.write("\n");
             }
+            //write an end marker to indicate the end of the index
             wr.write("end" + "\n");
             wr.close();
             System.out.println("=============EBD STORE=============");
@@ -326,16 +346,13 @@ public class Index5 {
     public boolean storageFileExists(String storageName){
         //open the file. the path must be set according to the computer that will run the code
         java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
-        //f must exist and must also be a file, not a directory
         if (f.exists() && !f.isDirectory())
             return true;
         return false;
             
     }
-
-    //----------------------------------------------------
-
-    //create a storage file
+//----------------------------------------------------
+//this function takes a storageName and creates a new storage file or overwrites an existing one with an initial marker end.
     public void createStore(String storageName) {
         try {
             //the path must be set according to the computer that will run the code
@@ -352,25 +369,34 @@ public class Index5 {
     //----------------------------------------------------
 
      //load index from hard disk into memory
+   //load index from hard disk into memory
     public HashMap<String, DictEntry> load(String storageName) {
         try {
-            String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;         
-            sources = new HashMap<Integer, SourceRecord>();
-            index = new HashMap<String, DictEntry>();
+//            modify this path and add the appropriate one
+            String pathToStorage = "is322_HW_1/"+storageName;
+            sources = new HashMap<Integer, SourceRecord>(); //stores each SourceRecord and its fileID
+            index = new HashMap<String, DictEntry>(); // stores the invertedList
+//            open source file for reading
             BufferedReader file = new BufferedReader(new FileReader(pathToStorage));
             String ln = "";
             int flen = 0;
+            //parsing each line
             while ((ln = file.readLine()) != null) {
+                // when 'section2' is reached, it indicates that all SourceRecords have been loaded
                 if (ln.equalsIgnoreCase("section2")) {
                     break;
                 }
+                // split the line to store its details
                 String[] ss = ln.split(",");
+                // fid stores fileID
                 int fid = Integer.parseInt(ss[0]);
                 try {
+                    // ensure the line is correctly parsed
                     System.out.println("**>>" + fid + " " + ss[1] + " " + ss[2].replace('~', ',') + " " + ss[3] + " [" + ss[4] + "]   " + ss[5].replace('~', ','));
-
+                    // create SourceRecord to store the file details
                     SourceRecord sr = new SourceRecord(fid, ss[1], ss[2].replace('~', ','), Integer.parseInt(ss[3]), Double.parseDouble(ss[4]), ss[5].replace('~', ','));
                     //   System.out.println("**>>"+fid+" "+ ss[1]+" "+ ss[2]+" "+ ss[3]+" ["+ Double.parseDouble(ss[4])+ "]  \n"+ ss[5]);
+                    //store the SourceRecord and its fileID
                     sources.put(fid, sr);
                 } catch (Exception e) {
 
@@ -378,22 +404,31 @@ public class Index5 {
                     e.printStackTrace();
                 }
             }
+            //parsing the invertedList and loading it in index
             while ((ln = file.readLine()) != null) {
                 //     System.out.println(ln);
+                // when 'end' is reached, it indicates that all inverted index entries have been loaded
                 if (ln.equalsIgnoreCase("end")) {
                     break;
                 }
+                // parse dictionary entry and posting list
                 String[] ss1 = ln.split(";");
-                String[] ss1a = ss1[0].split(",");
-                String[] ss1b = ss1[1].split(":");
+                String[] ss1a = ss1[0].split(",");//word details
+                String[] ss1b = ss1[1].split(":");//posting details
                 index.put(ss1a[0], new DictEntry(Integer.parseInt(ss1a[1]), Integer.parseInt(ss1a[2])));
-                String[] ss1bx;   //posting
+                String[] ss1bx;   //Individual posting entry
+                // Parse the posting list for the each term
                 for (int i = 0; i < ss1b.length; i++) {
                     ss1bx = ss1b[i].split(",");
+                    // if this is the first posting entry for the term initialize the posting list
+                    // and make the appropriate changes
                     if (index.get(ss1a[0]).pList == null) {
                         index.get(ss1a[0]).pList = new Posting(Integer.parseInt(ss1bx[0]), Integer.parseInt(ss1bx[1]));
                         index.get(ss1a[0]).last = index.get(ss1a[0]).pList;
-                    } else {
+                    }
+                    //  otherwise, append the new posting to the linked list
+                    // and make the appropriate changes
+                    else {
                         index.get(ss1a[0]).last.next = new Posting(Integer.parseInt(ss1bx[0]), Integer.parseInt(ss1bx[1]));
                         index.get(ss1a[0]).last = index.get(ss1a[0]).last.next;
                     }

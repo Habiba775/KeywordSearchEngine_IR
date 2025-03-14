@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
-      <module fileurl="file://$PROJECT_DIR$/work.iml" filepath="$PROJECT_DIR$/work.iml" />
-=======
       <module fileurl="file://$PROJECT_DIR$/KeywordSearchEngine_IR.iml" filepath="$PROJECT_DIR$/KeywordSearchEngine_IR.iml" />
->>>>>>> a1d353b0db88a8d322c7001a61799e162649153f
     </modules>
   </component>
 </project>
