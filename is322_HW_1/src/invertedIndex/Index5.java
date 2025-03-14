@@ -126,7 +126,7 @@ public class Index5 {
     public int indexOneLine(String ln, int fid) {
         int flen = 0;
 
-        //split the line to its composing words. This is done by using the regex "\\W+", which stands for any number of consecutive occurrences of any non-word character (anthing other than a letter, digit, or underscore).
+        //split the line to its composing words. This is done by using the regex "\\W+", which stands for any number of consecutive occurrences of any non-word character (anything other than a letter, digit, or underscore).
         String[] words = ln.split("\\W+");
         //String[] words = ln.replaceAll("(?:[^a-zA-Z0-9 -]|(?<=\\w)-(?!\\S))", " ").toLowerCase().split("\\s+");
         //the length of the line, which will be returned at the end = # of words in the line
@@ -231,20 +231,28 @@ public class Index5 {
         return answer;
     }
 
+    //this method prints the info of the documents where all the words in the "phrase" argument appear in each, then returns this info in the string "result"
     public String find_24_01(String phrase) { // any mumber of terms non-optimized search 
         String result = "";
+        //split the phrase to its words using a regex "\\W+", which stands for any number of consecutive occurrences of any non-word character (anything other than a letter, digit, or underscore)
+        //then store the number of words in len
         String[] words = phrase.split("\\W+");
         int len = words.length;
         
         //fix this if word is not in the hash table will crash...
+        //get the posting list of the first word from the index
         Posting posting = index.get(words[0].toLowerCase()).pList;
+        //starting from the second word, iterate over all the other words, and find the intersection between the docs where the current word appear and all the other previous words appear
         int i = 1;
         while (i < len) {
             posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
             i++;
         }
+        //here, "posting" will hold a posting list with all the docs such that each document of them contains all the words in the phrase
+        //iterate over the posting list
         while (posting != null) {
             //System.out.println("\t" + sources.get(num));
+            //output the following for each doc in the PL: doc ID, doc title, and doc length
             result += "\t" + posting.docId + " - " + sources.get(posting.docId).title + " - " + sources.get(posting.docId).length + "\n";
             posting = posting.next;
         }
@@ -314,8 +322,11 @@ public class Index5 {
 
     //=========================================
 
+    //checks if there is a storage file
     public boolean storageFileExists(String storageName){
+        //open the file. the path must be set according to the computer that will run the code
         java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
+        //f must exist and must also be a file, not a directory
         if (f.exists() && !f.isDirectory())
             return true;
         return false;
@@ -324,13 +335,15 @@ public class Index5 {
 
     //----------------------------------------------------
 
+    //create a storage file
     public void createStore(String storageName) {
         try {
+            //the path must be set according to the computer that will run the code
             String pathToStorage = "/home/ehab/tmpL11/"+storageName;
+            //write to the file then close it
             Writer wr = new FileWriter(pathToStorage);
             wr.write("end" + "\n");
             wr.close();
-            
         } catch (Exception e) {
             e.printStackTrace();
         }
