@@ -336,19 +336,24 @@ public class Index5 {
 
     //=========================================
 
+//this function takes storageName and checks whether this storage file exists in the specified directory
     public boolean storageFileExists(String storageName){
-        java.io.File f = new java.io.File("is322_HW_1/"+storageName);
+        //modify this path and add the appropriate one
+        java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
+        //return true if the file exists
         if (f.exists() && !f.isDirectory())
             return true;
+        //otherwise return false
         return false;
             
     }
-
-    //----------------------------------------------------
-
+//----------------------------------------------------
+//this function takes a storageName and creates a new storage file or overwrites an existing one with an initial marker end.
     public void createStore(String storageName) {
         try {
-            String pathToStorage = "is322_HW_1/"+storageName;
+            //modify this path and add the appropriate one
+            String pathToStorage = "/home/ehab/tmpL11/"+storageName;
+            //create and open file for writing
             Writer wr = new FileWriter(pathToStorage);
             wr.write("end" + "\n");
             wr.close();
