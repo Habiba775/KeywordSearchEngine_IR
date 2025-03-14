@@ -339,25 +339,33 @@ public class Index5 {
     //----------------------------------------------------
 
      //load index from hard disk into memory
+   //load index from hard disk into memory
     public HashMap<String, DictEntry> load(String storageName) {
         try {
+//            modify this path and add the appropriate one
             String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;         
-            sources = new HashMap<Integer, SourceRecord>();
-            index = new HashMap<String, DictEntry>();
+            sources = new HashMap<Integer, SourceRecord>(); //stores each SourceRecord and its fileID
+            index = new HashMap<String, DictEntry>(); // stores the invertedList
+//            open source file for reading
             BufferedReader file = new BufferedReader(new FileReader(pathToStorage));
             String ln = "";
-            int flen = 0;
+//          parsing each line
             while ((ln = file.readLine()) != null) {
+                // when 'section2' is reached, it indicates that all SourceRecords have been loaded
                 if (ln.equalsIgnoreCase("section2")) {
                     break;
                 }
+                // split the line to store its details
                 String[] ss = ln.split(",");
+                // fid stores fileID
                 int fid = Integer.parseInt(ss[0]);
                 try {
+                    // ensure the line is correctly parsed 
                     System.out.println("**>>" + fid + " " + ss[1] + " " + ss[2].replace('~', ',') + " " + ss[3] + " [" + ss[4] + "]   " + ss[5].replace('~', ','));
-
+                    // create SourceRecord to store the file details
                     SourceRecord sr = new SourceRecord(fid, ss[1], ss[2].replace('~', ','), Integer.parseInt(ss[3]), Double.parseDouble(ss[4]), ss[5].replace('~', ','));
                     //   System.out.println("**>>"+fid+" "+ ss[1]+" "+ ss[2]+" "+ ss[3]+" ["+ Double.parseDouble(ss[4])+ "]  \n"+ ss[5]);
+                    //store the SourceRecord and its fileID
                     sources.put(fid, sr);
                 } catch (Exception e) {
 
@@ -365,22 +373,31 @@ public class Index5 {
                     e.printStackTrace();
                 }
             }
+            //parsing the invertedList and loading it in index
             while ((ln = file.readLine()) != null) {
                 //     System.out.println(ln);
+                // when 'end' is reached, it indicates that all inverted index entries have been loaded
                 if (ln.equalsIgnoreCase("end")) {
                     break;
                 }
+                // parse dictionary entry and posting list
                 String[] ss1 = ln.split(";");
-                String[] ss1a = ss1[0].split(",");
-                String[] ss1b = ss1[1].split(":");
+                String[] ss1a = ss1[0].split(",");//word details
+                String[] ss1b = ss1[1].split(":");//posting details
                 index.put(ss1a[0], new DictEntry(Integer.parseInt(ss1a[1]), Integer.parseInt(ss1a[2])));
-                String[] ss1bx;   //posting
+                String[] ss1bx;   //Individual posting entry
+                // Parse the posting list for the each term
                 for (int i = 0; i < ss1b.length; i++) {
                     ss1bx = ss1b[i].split(",");
+                    // if this is the first posting entry for the term initialize the posting list
+                    // and make the appropriate changes
                     if (index.get(ss1a[0]).pList == null) {
                         index.get(ss1a[0]).pList = new Posting(Integer.parseInt(ss1bx[0]), Integer.parseInt(ss1bx[1]));
                         index.get(ss1a[0]).last = index.get(ss1a[0]).pList;
-                    } else {
+                    }
+                    //  otherwise, append the new posting to the linked list
+                    // and make the appropriate changes
+                    else {
                         index.get(ss1a[0]).last.next = new Posting(Integer.parseInt(ss1bx[0]), Integer.parseInt(ss1bx[1]));
                         index.get(ss1a[0]).last = index.get(ss1a[0]).last.next;
                     }
