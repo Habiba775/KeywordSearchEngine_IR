@@ -25,10 +25,11 @@ import java.io.PrintWriter;
 public class Index5 {
 
     //--------------------------------------------
+
     int N = 0;
     public Map<Integer, SourceRecord> sources;  // store the doc_id and the file name.
+    public HashMap<String, DictEntry> index; // The inverted index
 
-    public HashMap<String, DictEntry> index; // THe inverted index
     //--------------------------------------------
 
     public Index5() {
@@ -40,17 +41,24 @@ public class Index5 {
         N = n;
     }
 
-
     //---------------------------------------------
+
     public void printPostingList(Posting p) {
         // Iterator<Integer> it2 = hset.iterator();
+
+        //enclose the posting list between a pair of square brackets []
         System.out.print("[");
+
+        //iterate over the posting
         while (p != null) {
             /// -4- **** complete here ****
             // fix get rid of the last comma
-            System.out.print("" + p.docId );
-            p = p.next;
 
+            //print the docID of the current posting
+            System.out.print("" + p.docId);
+
+            //after moving to the next posting, check if it's null (which will mean that the previous posting was the last one). Only if the posting isn't the last one, write a comma.
+            p = p.next;
             if (p != null) {
                 System.out.print(",");
             }
@@ -59,36 +67,49 @@ public class Index5 {
     }
 
     //---------------------------------------------
+
     public void printDictionary() {
+        //create an iterator on the "index" map
         Iterator it = index.entrySet().iterator();
+        //iterator over the index
         while (it.hasNext()) {
+            //save the current map entry (key-value) in "pair"
             Map.Entry pair = (Map.Entry) it.next();
+            //save the value of the current map entry in "dd"
             DictEntry dd = (DictEntry) pair.getValue();
+            //this prints the entire index entry, which is, respectively; the term, the document frequency, and the posting list
             System.out.print("** [" + pair.getKey() + "," + dd.doc_freq + "]       =--> ");
             printPostingList(dd.pList);
         }
         System.out.println("------------------------------------------------------");
+        //prints the size of the index (# of entries)
         System.out.println("*** Number of terms = " + index.size());
     }
  
     //-----------------------------------------------
+
     public void buildIndex(String[] files) {  // from disk not from the internet
+        //give each file/document a unique id, starting with 0 and incrementing it by one for every file
         int fid = 0;
         for (String fileName : files) {
+            //open the file for reading
             try (BufferedReader file = new BufferedReader(new FileReader(fileName))) {
+                //if the current file ("fileName") isn't found in the sources map, add it
                 if (!sources.containsKey(fileName)) {
                     sources.put(fid, new SourceRecord(fid, fileName, fileName, "notext"));
                 }
-                String ln;
-                int flen = 0;
+                String ln;  //will store one line in the file at a time
+                int flen = 0;   //will store the file's length
+
+                //read every line in the file
                 while ((ln = file.readLine()) != null) {
                     /// -2- **** complete here ****
-
-                    flen += indexOneLine(ln, fid);
                     ///**** hint   flen +=  ________________(ln, fid);
+                    //add the lenth of the current line "ln" to the flen
+                    flen += indexOneLine(ln, fid);
                 }
+                //store the file's length in the length attribute of the source Record
                 sources.get(fid).length = flen;
-
             } catch (IOException e) {
                 System.out.println("File " + fileName + " not found. Skip it");
             }
@@ -97,49 +118,68 @@ public class Index5 {
         //   printDictionary();
     }
 
-    //----------------------------------------------------------------------------  
+    //----------------------------------------------------------------------------
+
+    //this method has 2 primary functionalities:
+    // 1. return the length of the ln argument in the form of the variable "flen"
+    // 2. add each word in the ln argument to the index by following the indexing steps
     public int indexOneLine(String ln, int fid) {
         int flen = 0;
 
+        //split the line to its composing words. This is done by using the regex "\\W+", which stands for any number of consecutive occurrences of any non-word character (anthing other than a letter, digit, or underscore).
         String[] words = ln.split("\\W+");
-      //   String[] words = ln.replaceAll("(?:[^a-zA-Z0-9 -]|(?<=\\w)-(?!\\S))", " ").toLowerCase().split("\\s+");
+        //String[] words = ln.replaceAll("(?:[^a-zA-Z0-9 -]|(?<=\\w)-(?!\\S))", " ").toLowerCase().split("\\s+");
+        //the length of the line, which will be returned at the end = # of words in the line
         flen += words.length;
+        //iterate over every word in the ln
         for (String word : words) {
+            //standardize all words to lowercase
             word = word.toLowerCase();
+            //step 1: remove stop words, where they won't even be added to the index
             if (stopWord(word)) {
                 continue;
             }
+            //step 2: if not a stop word, change it to its stem word
             word = stemWord(word);
+
             // check to see if the word is not in the dictionary
             // if not add it
             if (!index.containsKey(word)) {
                 index.put(word, new DictEntry());
             }
-            // add document id to the posting list
+            //by now we are sure that there is an entry for word, whether it has a posting list or not.
+            //if this document with id == fid isn't in the posting list of "word", add fid to the posting list
             if (!index.get(word).postingListContains(fid)) {
-                index.get(word).doc_freq += 1; //set doc freq to the number of doc that contain the term 
+                //increase the number of documents where word appears by one, which is the document with fid
+                index.get(word).doc_freq += 1; //set doc freq to the number of doc that contain the term
+                //if word has no posting list, create one for it and add fid to it, then equate pList with last, where both of them point to fid
                 if (index.get(word).pList == null) {
                     index.get(word).pList = new Posting(fid);
                     index.get(word).last = index.get(word).pList;
+                //else if it has a posting list, just add fid to it and move the "last" pointer to point to the added fid
                 } else {
                     index.get(word).last.next = new Posting(fid);
                     index.get(word).last = index.get(word).last.next;
                 }
+            //else if fid is already in the posting list of word, just increase dtf by one, which indicates the number of occurrences of word in this document
             } else {
                 index.get(word).last.dtf += 1;
             }
-            //set the term_fteq in the collection
+            //set the term_freq in the collection
+            //increase the number of times this term "word" appears in the collection
             index.get(word).term_freq += 1;
-            if (word.equalsIgnoreCase("lattice")) {
 
+            //TODO: comment this conditional ??????????????????????????
+            if (word.equalsIgnoreCase("lattice")) {
                 System.out.println("  <<" + index.get(word).getPosting(1) + ">> " + ln);
             }
-
         }
         return flen;
     }
 
-//----------------------------------------------------------------------------  
+    //----------------------------------------------------------------------------
+
+    //check if word is a stop word. It's assumed in this method that any word composed on one character or belonging to any of the words in the first conditional is a stop word.
     boolean stopWord(String word) {
         if (word.equals("the") || word.equals("to") || word.equals("be") || word.equals("for") || word.equals("from") || word.equals("in")
                 || word.equals("a") || word.equals("into") || word.equals("by") || word.equals("or") || word.equals("and") || word.equals("that")) {
@@ -149,10 +189,11 @@ public class Index5 {
             return true;
         }
         return false;
-
     }
-//----------------------------------------------------------------------------  
 
+    //----------------------------------------------------------------------------
+
+    //should return the stem of word
     String stemWord(String word) { //skip for now
         return word;
 //        Stemmer s = new Stemmer();
@@ -161,14 +202,14 @@ public class Index5 {
 //        return s.toString();
     }
 
-    //----------------------------------------------------------------------------  
-    Posting intersect(Posting pL1, Posting pL2) {
-///****  -1-   complete after each comment ****
-//   INTERSECT ( pL1 , pL2 )
-//          1  answer ←      {}
-        Posting answer = null;
-        Posting last = null;
+    //----------------------------------------------------------------------------
 
+    //TODO: comment this method
+    Posting intersect(Posting pL1, Posting pL2) {
+        Posting answer = null;      //will hold the PL with the common documents in the two arguments
+        Posting last = null;        //an auxiliary PL
+
+        //iterate over the two posting lists
         while (pL1 != null && pL2 != null) {
             if (pL1.docId == pL2.docId) {
                 Posting match = new Posting(pL1.docId);
@@ -186,7 +227,6 @@ public class Index5 {
             } else {
                 pL2 = pL2.next;
             }
-            
         }
         return answer;
     }
@@ -211,8 +251,8 @@ public class Index5 {
         return result;
     }
     
-    
     //---------------------------------
+
     String[] sort(String[] words) {  //bubble sort
         boolean sorted = false;
         String sTmp;
@@ -271,7 +311,9 @@ public class Index5 {
             e.printStackTrace();
         }
     }
-//=========================================    
+
+    //=========================================
+
     public boolean storageFileExists(String storageName){
         java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
         if (f.exists() && !f.isDirectory())
@@ -279,7 +321,9 @@ public class Index5 {
         return false;
             
     }
-//----------------------------------------------------    
+
+    //----------------------------------------------------
+
     public void createStore(String storageName) {
         try {
             String pathToStorage = "/home/ehab/tmpL11/"+storageName;
@@ -291,7 +335,9 @@ public class Index5 {
             e.printStackTrace();
         }
     }
-//----------------------------------------------------      
+
+    //----------------------------------------------------
+
      //load index from hard disk into memory
     public HashMap<String, DictEntry> load(String storageName) {
         try {
@@ -347,6 +393,6 @@ public class Index5 {
         }
         return index;
     }
-}
 
-//=====================================================================
+    //=====================================================================
+}
