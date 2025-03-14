@@ -290,7 +290,7 @@ public class Index5 {
     public void store(String storageName) {
         try {
             //  modify this path and add the appropriate one
-            String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;
+            String pathToStorage = "is322_HW_1/"+storageName;
             // open file for reading
             Writer wr = new FileWriter(pathToStorage);
             // write the source records into the file
@@ -345,7 +345,7 @@ public class Index5 {
     //checks if there is a storage file
     public boolean storageFileExists(String storageName){
         //open the file. the path must be set according to the computer that will run the code
-        java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
+        java.io.File f = new java.io.File("is322_HW_1/"+storageName);
         if (f.exists() && !f.isDirectory())
             return true;
         return false;
@@ -356,7 +356,7 @@ public class Index5 {
     public void createStore(String storageName) {
         try {
             //the path must be set according to the computer that will run the code
-            String pathToStorage = "/home/ehab/tmpL11/"+storageName;
+            String pathToStorage = "is322_HW_1//"+storageName;
             //write to the file then close it
             Writer wr = new FileWriter(pathToStorage);
             wr.write("end" + "\n");
