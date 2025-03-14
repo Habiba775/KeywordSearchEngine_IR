@@ -282,7 +282,7 @@ public class Index5 {
 
     public void store(String storageName) {
         try {
-            String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;
+            String pathToStorage = "is322_HW_1/"+storageName;
             Writer wr = new FileWriter(pathToStorage);
             for (Map.Entry<Integer, SourceRecord> entry : sources.entrySet()) {
                 System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue().URL + ", Value = " + entry.getValue().title + ", Value = " + entry.getValue().text);
@@ -321,7 +321,7 @@ public class Index5 {
     //=========================================
 
     public boolean storageFileExists(String storageName){
-        java.io.File f = new java.io.File("/home/ehab/tmpL11/rl/"+storageName);
+        java.io.File f = new java.io.File("is322_HW_1/"+storageName);
         if (f.exists() && !f.isDirectory())
             return true;
         return false;
@@ -332,7 +332,7 @@ public class Index5 {
 
     public void createStore(String storageName) {
         try {
-            String pathToStorage = "/home/ehab/tmpL11/"+storageName;
+            String pathToStorage = "is322_HW_1/"+storageName;
             Writer wr = new FileWriter(pathToStorage);
             wr.write("end" + "\n");
             wr.close();
@@ -349,7 +349,7 @@ public class Index5 {
     public HashMap<String, DictEntry> load(String storageName) {
         try {
 //            modify this path and add the appropriate one
-            String pathToStorage = "/home/ehab/tmpL11/rl/"+storageName;         
+            String pathToStorage = "is322_HW_1/"+storageName;
             sources = new HashMap<Integer, SourceRecord>(); //stores each SourceRecord and its fileID
             index = new HashMap<String, DictEntry>(); // stores the invertedList
 //            open source file for reading
