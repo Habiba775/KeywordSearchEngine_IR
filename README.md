@@ -11,7 +11,7 @@ Efficient posting list intersection for query processing.
 # Installation & Usage
 ## 1. Clone the Repository
 ```
-git clone https://github.com/your-username/KeywordSearchEngine.git
+git clone https://github.com/Habiba775/KeywordSearchEngine.git
 ```
 ## 2.Open in IntelliJ IDEA(or any java IDE)
 ```
