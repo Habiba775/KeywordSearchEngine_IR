@@ -26,5 +26,7 @@ git clone https://github.com/your-username/KeywordSearchEngine.git
 -Run the stemmer & Test class .
 ```
 ## 4. Provide the Collection Directory
+```
 Ensure the Collection directory contains the text files to be indexed.
+```
 
