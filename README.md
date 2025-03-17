@@ -9,16 +9,22 @@ Supports Boolean retrieval by finding files containing all given keywords.
 Efficient posting list intersection for query processing.
 
 # Installation & Usage
-# 1. Clone the Repository
+## 1. Clone the Repository
+```
 git clone https://github.com/your-username/KeywordSearchEngine.git
-# 2.Open in IntelliJ IDEA(or any java IDE)
+```
+## 2.Open in IntelliJ IDEA(or any java IDE)
+```
 -Open IntelliJ IDEA.
 -Click on File > Open and select the project directory.
 -Wait for IntelliJ to index the project.
 -**Ensure the SDK is correctly set to Java.
-# 3. Build and Run the Project
+```
+## 3. Build and Run the Project
+```
 -In IntelliJ, navigate to Build > Build Project.
 -Run the stemmer & Test class .
-# 4. Provide the Collection Directory
+```
+## 4. Provide the Collection Directory
 Ensure the Collection directory contains the text files to be indexed.
 
