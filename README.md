@@ -23,7 +23,7 @@ git clone https://github.com/your-username/KeywordSearchEngine.git
 ## 3. Build and Run the Project
 ```
 -In IntelliJ, navigate to Build > Build Project.
--Run the stemmer & Test class .
+-Run the Test class ( navigate to Src > InvertedIndex > Test) .
 ```
 ## 4. Provide the Collection Directory
 ```
