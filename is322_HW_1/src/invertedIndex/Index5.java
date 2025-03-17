@@ -242,6 +242,14 @@ public class Index5 {
         //then store the number of words in len
         String[] words = phrase.split("\\W+");
         int len = words.length;
+
+        // Check if all words exist in the index before proceeding
+        for (int i = 0; i < len; i++) {
+            String word = words[i].toLowerCase();
+            if (!index.containsKey(word)) {
+                return "No results found for '" + phrase + "'";
+       }
+}
         
         //fix this if word is not in the hash table will crash...
         Posting posting = index.get(words[0].toLowerCase()).pList;
