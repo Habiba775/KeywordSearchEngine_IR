@@ -195,11 +195,11 @@ public class Index5 {
 
     //should return the stem of word
     String stemWord(String word) { //skip for now
-        return word;
-//        Stemmer s = new Stemmer();
-//        s.addString(word);
-//        s.stem();
-//        return s.toString();
+
+        Stemmer s = new Stemmer();
+        s.addString(word);
+        s.stem();
+        return s.toString();
     }
 
     //----------------------------------------------------------------------------

@@ -17,13 +17,11 @@ public class Test {
 
     public static void main(String args[]) throws IOException {
         Index5 index = new Index5();
-        //|**  change it to your collection directory 
-        //|**  in windows "C:\\tmp11\\rl\\collection\\"       
+
         String files = "is322_HW_1/Collection/";
 
         File file = new File(files);
-        //|** String[] 	list()
-        //|**  Returns an array of strings naming the files and directories in the directory denoted by this abstract pathname.
+
         String[] fileList = file.list();
 
         fileList = index.sort(fileList);
@@ -45,8 +43,20 @@ public class Test {
             System.out.println("Print search phrase: ");
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             phrase = in.readLine();
-/// -3- **** complete here ****
-            System.out.println("Boo0lean Model result = \n" + index.find_24_01(phrase));
+
+            if (!phrase.isEmpty()) {
+                // Inline stemming on input phrase
+                String[] words = phrase.toLowerCase().split("\\W+");
+                StringBuilder stemmedPhrase = new StringBuilder();
+
+                for (String word : words) {
+                    if (!word.isEmpty()) {
+                        stemmedPhrase.append(index.stemWord(word)).append(" ");
+                    }
+                }
+
+                System.out.println("Boo0lean Model result = \n" + index.find_24_01(stemmedPhrase.toString().trim()));
+            }
         } while (!phrase.isEmpty());
 
     }
